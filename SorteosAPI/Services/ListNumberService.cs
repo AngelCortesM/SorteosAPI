@@ -58,7 +58,7 @@ namespace SorteosAPI.Services
                                     RaffleName = reader.GetString(reader.GetOrdinal("RaffleName")),
                                     IdUser = reader.GetInt32(reader.GetOrdinal("IdUser")),
                                     UserName = reader.GetString(reader.GetOrdinal("UserName")),
-                                    Number = reader.GetInt32(reader.GetOrdinal("Number")),
+                                    Number = reader.GetString(reader.GetOrdinal("Number")),
                                     IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive"))
                                 });
                             }
@@ -73,7 +73,7 @@ namespace SorteosAPI.Services
             }
             catch (Exception ex)
             {
-                return (false, null, 0, $"Ocurrió un error: {ex.Message}");
+                return (false, new List<ListNumberRaffer>(), 0, $"Ocurrió un error: {ex.Message}");
             }
         }
     }

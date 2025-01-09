@@ -13,7 +13,7 @@ namespace SorteosAPI.Models
         [Required(ErrorMessage = "El usuario es obligatorio.")]
         public int IdUser { get; set; }
 
-        public int Number { get; set; }
+        public string Number { get; set; }
         public bool IsActive { get; set; } = true;
     }
 
@@ -26,7 +26,7 @@ namespace SorteosAPI.Models
         public string RaffleName { get; set; }
         public int IdUser { get; set; }
         public string UserName { get; set; }
-        public int Number { get; set; }
+        public string Number { get; set; }
         public bool IsActive { get; set; } = true;
     }
 }

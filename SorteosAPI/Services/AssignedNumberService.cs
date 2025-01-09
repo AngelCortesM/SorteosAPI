@@ -56,18 +56,18 @@ namespace SorteosAPI.Services
                         // Recuperar valores de salida
                         int? generatedNumber = generatedNumberParam.Value != DBNull.Value ? (int?)generatedNumberParam.Value : null;
                         bool success = successParam.Value != DBNull.Value && (bool)successParam.Value;
-                        string message = messageParam.Value != DBNull.Value ? messageParam.Value.ToString() : string.Empty;
+                        string message = messageParam.Value != DBNull.Value ? messageParam.Value?.ToString() ?? string.Empty : string.Empty;
 
                         // Asignar el número generado al modelo
-                        model.Number = generatedNumber ?? 0;
+                        model.Number = generatedNumber?.ToString() ?? "0";
 
-                        return (success, model, message);
+                        return (success, model, message ?? string.Empty);
                     }
                 }
             }
             catch (Exception ex)
             {
-                return (false, null, $"Ocurrió un error: {ex.Message}");
+                return (false, new AssignedNumberRaffer { Number = "0" }, $"Ocurrió un error: {ex.Message}");
             }
         }
     }

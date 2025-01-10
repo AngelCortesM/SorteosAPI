@@ -5,10 +5,8 @@ using SorteosAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Cargar el archivo .env
 DotEnv.Load();
 
-// Obtener la cadena de conexión de la variable de entorno
 var connectionString = Environment.GetEnvironmentVariable("DefaultConnection");
 
 if (string.IsNullOrEmpty(connectionString))
@@ -16,10 +14,8 @@ if (string.IsNullOrEmpty(connectionString))
     throw new InvalidOperationException("La variable de entorno 'DefaultConnection' no está configurada.");
 }
 
-// Agregar la cadena de conexión a la configuración
 builder.Configuration["ConnectionStrings:DefaultConnection"] = connectionString;
 
-// Agregar servicios al contenedor
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -37,11 +33,13 @@ builder.Services.AddDbContext<SorteosDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IAssignedNumberService, AssignedNumberService>();
 builder.Services.AddScoped<IListNumberService, ListNumberService>();
+builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddScoped<IRaffleService, RaffleService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 app.UseCors();
 
-// Configurar el pipeline de solicitudes HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

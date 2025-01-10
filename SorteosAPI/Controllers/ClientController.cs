@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using SorteosAPI.Models;
-using System.Data;
+using SorteosAPI.Services;
 
 namespace SorteosAPI.Controllers
 {
@@ -9,16 +8,15 @@ namespace SorteosAPI.Controllers
     [Route("api/[controller]")]
     public class ClientController : ControllerBase
     {
-        private readonly string _connectionString;
+        private readonly IClientService _clientService;
 
-        public ClientController(IConfiguration configuration)
+        public ClientController(IClientService clientService)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection")
-                ?? throw new ArgumentNullException(nameof(_connectionString), "La cadena de conexión no puede ser nula.");
+            _clientService = clientService;
         }
 
         [HttpPost]
-        public IActionResult CreateClient([FromBody] ClientCreate clientCreate)
+        public async Task<IActionResult> CreateClient([FromBody] ClientCreate clientCreate)
         {
             if (clientCreate == null)
             {
@@ -27,96 +25,40 @@ namespace SorteosAPI.Controllers
 
             try
             {
-                using (var connection = new SqlConnection(_connectionString))
+                var result = await _clientService.CreateClientAsync(clientCreate);
+
+                if (result)
                 {
-                    connection.Open();
-
-                    using (var command = new SqlCommand("CreateClient", connection))
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
-
-                        command.Parameters.AddWithValue("@Name", clientCreate.Name);
-                        command.Parameters.AddWithValue("@IsActive", clientCreate.IsActive);
-
-                        command.ExecuteNonQuery();
-                    }
+                    return Ok(new { success = true, message = "Cliente creado exitosamente." });
                 }
-
-                return Ok(new { success = true, message = "Cliente creado exitosamente." });
-            }
-            catch (SqlException ex)
-            {
-                return StatusCode(500, new
+                else
                 {
-                    success = false,
-                    message = "Error al crear el cliente.",
-                    error = ex.Message
-                });
+                    return StatusCode(500, new { success = false, message = "Error al crear el cliente." });
+                }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Ocurrió un error inesperado.",
-                    error = ex.Message
-                });
+                return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
 
         [HttpGet("list")]
-        public IActionResult GetClients()
+        public async Task<IActionResult> GetClients()
         {
             try
             {
-                var clients = new List<Client>();
+                var clients = await _clientService.GetClientsAsync();
 
-                using (var connection = new SqlConnection(_connectionString))
+                if (clients.Count == 0)
                 {
-                    connection.Open();
-
-                    using (var command = new SqlCommand("GetAllClients", connection))
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
-
-                        using (var reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                var client = new Client
-                                {
-                                    IdClient = reader.IsDBNull(reader.GetOrdinal("IdClient")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("IdClient")),
-                                    Name = reader.GetString(reader.GetOrdinal("Name")),
-                                    CreatedAt = reader.IsDBNull(reader.GetOrdinal("CreatedAt")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
-                                    UpdatedAt = reader.IsDBNull(reader.GetOrdinal("UpdatedAt")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("UpdatedAt")),
-                                    IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive"))
-                                };
-
-                                clients.Add(client);
-                            }
-                        }
-                    }
+                    return NotFound(new { success = false, message = "No se encontraron clientes." });
                 }
 
                 return Ok(new { success = true, data = clients });
             }
-            catch (SqlException ex)
-            {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Error al obtener los clientes.",
-                    error = ex.Message
-                });
-            }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Ocurrió un error inesperado.",
-                    error = ex.Message
-                });
+                return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
     }

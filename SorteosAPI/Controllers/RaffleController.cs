@@ -83,8 +83,17 @@
                 {
                     connection.Open();
 
-                    var query = "SELECT IdRaffle, Name, CreatedAt, UpdatedAt, IsActive FROM Raffles";
-
+                    var query = @"SELECT
+                                        r.IdRaffle,
+                                        ISNULL(rc.IdClient, 0) AS IdClient,
+                                        r.Name,
+                                        r.CreatedAt,
+                                        r.UpdatedAt,
+                                        r.IsActive
+                                    FROM
+                                        Raffles r
+                                    LEFT JOIN
+                                        RaffleByClient rc ON r.IdRaffle = rc.IdRaffle";
                     using (var command = new SqlCommand(query, connection))
                     {
                         using (var reader = command.ExecuteReader())
@@ -94,6 +103,7 @@
                                 var raffle = new Raffle
                                 {
                                     IdRaffle = reader.GetInt32(reader.GetOrdinal("IdRaffle")),
+                                    IdClient = reader.GetInt32(reader.GetOrdinal("IdClient")),
                                     Name = reader.GetString(reader.GetOrdinal("Name")),
                                     CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
                                     UpdatedAt = reader.GetDateTime(reader.GetOrdinal("UpdatedAt")),

@@ -95,14 +95,9 @@
             }
         }
 
-        [HttpGet("list/{idClient}")]
-        public IActionResult GetUsersByClientId(int idClient)
+        [HttpGet("list")]
+        public IActionResult GetUsersByClientId([FromQuery] string? name = null)
         {
-            if (!ClientExists(idClient))
-            {
-                return BadRequest(new { success = false, message = "El cliente con el Id proporcionado no existe." });
-            }
-
             try
             {
                 var users = new List<User>();
@@ -111,11 +106,18 @@
                 {
                     connection.Open();
 
-                    var query = "SELECT IdUser, IdClient, Name, CreatedAt, UpdatedAt, IsActive FROM Users WHERE IdClient = @IdClient";
+                    var query = "SELECT IdUser, IdClient, Name, CreatedAt, UpdatedAt, IsActive FROM Users";
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        query += " Where Name LIKE @Name";
+                    }
 
                     using (var command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@IdClient", idClient);
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                            command.Parameters.AddWithValue("@Name", $"%{name}%");
+                        }
 
                         using (var reader = command.ExecuteReader())
                         {

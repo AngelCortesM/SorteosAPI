@@ -22,6 +22,6 @@ namespace SorteosAPI.Models
         [Required(ErrorMessage = "El sorteo es obligatorio.")]
         public int IdRaffle { get; set; }
 
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; set; }
     }
 }

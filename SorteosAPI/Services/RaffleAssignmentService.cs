@@ -42,6 +42,7 @@ namespace SorteosAPI.Services
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@IdClient", assignment.IdClient);
                         command.Parameters.AddWithValue("@IdRaffle", assignment.IdRaffle);
+                        command.Parameters.AddWithValue("@IsActive", assignment.IsActive);
 
                         await command.ExecuteNonQueryAsync();
                     }
@@ -153,8 +154,8 @@ namespace SorteosAPI.Services
                     var query = "SELECT rbc.IdRaffleByClient, rbc.IdClient, rbc.IdRaffle, c.Name AS ClientName, r.Name AS RaffleName, rbc.CreatedAt, rbc.UpdatedAt, rbc.IsActive " +
                             "FROM RaffleByClient rbc " +
                             "INNER JOIN Clients c ON rbc.IdClient = c.IdClient " +
-                            "INNER JOIN Raffles r ON rbc.IdRaffle = r.IdRaffle " +
-                            "WHERE rbc.IsActive = 1";
+                            "INNER JOIN Raffles r ON rbc.IdRaffle = r.IdRaffle ";
+                          
 
                     if (idClient.HasValue)
                     {

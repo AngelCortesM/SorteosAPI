@@ -28,7 +28,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "RaffersAPI": {
+    "RafflesAPI": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

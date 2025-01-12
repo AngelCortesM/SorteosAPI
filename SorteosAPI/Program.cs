@@ -36,6 +36,7 @@ builder.Services.AddScoped<IListNumberService, ListNumberService>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IRaffleService, RaffleService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRaffleAssignmentService, RaffleAssignmentService>();
 
 var app = builder.Build();
 app.UseCors();
